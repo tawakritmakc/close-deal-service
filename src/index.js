@@ -7,6 +7,7 @@ const {
   handleSurveyCompleted,
   handleSecondPaymentCompleted,
   handleHandoverCompleted,
+  handleSettlementCompleted,
 } = require('./services/close-deal.service');
 const closeDealRoutes = require('./routes/close-deal.routes');
 
@@ -34,6 +35,9 @@ const kafkaHandler = async (topic, payload) => {
     case 'postsales.handover.completed':
       await handleHandoverCompleted(payload);
       break;
+    case 'payment.settlement.completed':
+      await handleSettlementCompleted(payload);
+      break;
     default:
       console.warn(`⚠️ Unhandled topic: ${topic}`);
   }
@@ -50,6 +54,7 @@ const start = async () => {
         'sale.statussurvey.complete',
         'payment.secondpayment.completed',
         'postsales.handover.completed',
+        'payment.settlement.completed',
       ],
       kafkaHandler
     );
