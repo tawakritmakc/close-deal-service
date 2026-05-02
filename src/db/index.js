@@ -26,6 +26,20 @@ const initDB = async () => {
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
       );
+    CREATE TABLE IF NOT EXISTS settlements (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      settlement_id VARCHAR(100) UNIQUE NOT NULL,
+      sale_id VARCHAR(100),
+      property_id VARCHAR(100),
+      customer_id VARCHAR(100),
+      agent_id VARCHAR(100),
+      total_revenue NUMERIC(15, 2),
+      commission_rate NUMERIC(5, 4),
+      commission_amount NUMERIC(15, 2),
+      net_revenue NUMERIC(15, 2),
+      settled_at TIMESTAMP,
+      created_at TIMESTAMP DEFAULT NOW()
+);
     `);
     console.log('✅ Database initialized');
   } finally {
