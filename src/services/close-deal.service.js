@@ -248,7 +248,31 @@ const tryAutoClose = async (bookingId) => {
     await closeDeal(bookingId);
   }
 };
+const handleSettlementCompleted = async (payload) => {
+  const {
+    settlementId, saleId, propertyId, customerId, agentId,
+    totalRevenue, commissionRate, commissionAmount, netRevenue, settledAt,
+  } = payload;
 
+  try {
+    await pool.query(
+      `INSERT INTO settlements
+        (settlement_id, sale_id, property_id, customer_id, agent_id,
+         total_revenue, commission_rate, commission_amount, net_revenue, settled_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+       ON CONFLICT (settlement_id) DO UPDATE SET
+         total_revenue     = EXCLUDED.total_revenue,
+         commission_amount = EXCLUDED.commission_amount,
+         net_revenue       = EXCLUDED.net_revenue,
+         settled_at        = EXCLUDED.settled_at`,
+      [settlementId, saleId, propertyId, customerId, agentId,
+       totalRevenue, commissionRate, commissionAmount, netRevenue, settledAt]
+    );
+    console.log(`💰 Settlement recorded: ${settlementId}`);
+  } catch (err) {
+    console.error('❌ Failed to record settlement:', err.message);
+  }
+};
 module.exports = {
   createCloseDeal,
   getCloseDeals,
@@ -259,4 +283,5 @@ module.exports = {
   handleSurveyCompleted,
   handleSecondPaymentCompleted,
   handleHandoverCompleted,
+  handleSettlementCompleted,
 };
